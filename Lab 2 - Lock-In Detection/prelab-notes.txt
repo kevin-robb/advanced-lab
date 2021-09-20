@@ -1,0 +1,4 @@
+only do band pass vs lock-in
+measure each and with lights in room off vs on
+don't include "first half" where we are just learning how to use apparatus, and don't put stuff about low freq distortion into paper unless necessary in exp/analysis.
+measure noise by taking measurement when source is off, and compare power as ratio of regular measurement to the noise measurement. our equation is wrong, used for single samples not for signals

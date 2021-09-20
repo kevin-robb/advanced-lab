@@ -1,0 +1,193 @@
+---
+title: "lockin"
+author: "Kevin Robb"
+date: "10/16/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r readdata}
+# read in actual data
+amp50 = read.csv("oct15_amp_50Hz.csv")
+lockin50 = read.csv("oct15_lockin_50Hz.csv")
+amp150 = read.csv("oct16_amp_150Hz.csv")
+lockin150 = read.csv("oct16_lockin_150Hz.csv")
+```
+
+```{r amp50_vs_lockin50}
+png("figure2.png", width=500, height=350) #open the file
+
+#plot amp50 data with fit
+plot(SNR~POSITION,data=amp50,pch=21,bg="black",xlim=c(0,5),ylim=c(0,20),cex=1.2,ylab="Signal-to-Noise Ratio",xlab="LED Position (cm)")
+# error bars
+arrows(amp50$POSITION, amp50$SNR - amp50$SIG_ERR/amp50$NOISE_ERR, amp50$POSITION, amp50$SNR + amp50$SIG_ERR/amp50$NOISE_ERR, length=0.05, angle=90, code=3)
+#hard code fitting function (calculated below)
+vert=41.2174
+horz=-1.0026
+shift=-7.2300
+x<-seq(0.2,5,0.1)
+lines(x,vert/(x - horz)+shift, col="black")
+
+#plot lockin50 data on same graph
+points(SNR~POSITION,data=lockin50,pch=1,bg="red",cex=1.2,col="red")
+# error bars
+arrows(lockin50$POSITION, lockin50$SNR - lockin50$SIG_ERR/lockin50$NOISE_ERR, lockin50$POSITION, lockin50$SNR + lockin50$SIG_ERR/lockin50$NOISE_ERR, length=0.05, angle=90, code=3, col="red")
+#hard code fitting function (calculated below)
+vert=24.8037 
+horz=-0.6658
+shift=-1.7203
+x<-seq(0.2,5,0.1)
+lines(x,vert/(x - horz)+shift, col="red")
+
+#add legend to plot
+legend("topright", legend=c("Amplitude (Bandpass)", "Lock-in"), col=c("black", "red"), pch = c(16,1), cex=1.2) #lty=1:2
+
+dev.off() #close the file
+```
+
+```{r fit_amp50}
+xdata = amp50$POSITION
+ydata = amp50$SNR
+y = ydata
+x = xdata
+#x<-seq(0.2,5,0.5)
+rat=nls(y~vert/(x - horz)+shift, start=list(vert=10,horz=0,shift=0))
+summary(rat)
+plot(xdata,ydata, col="black",pch=16,cex=1.1, xlim=c(0,6),ylim=c(0,20))
+lines(x,predict(rat),col="red") #actual prediction
+#hard code function to make smooth
+vert=41.2174
+horz=-1.0026
+shift=-7.2300
+x<-seq(0.2,5,0.1)
+lines(x,vert/(x - horz)+shift, col="blue")
+```
+
+```{r fit_lockin50}
+xdata = lockin50$POSITION
+ydata = lockin50$SNR
+y = ydata
+x = xdata
+#x<-seq(0.2,5,0.5)
+rat=nls(y~vert/(x - horz)+shift, start=list(vert=10,horz=0,shift=0))
+summary(rat)
+plot(xdata,ydata, col="black",pch=16,cex=1.1, xlim=c(0,6),ylim=c(0,20))
+lines(x,predict(rat),col="red") #actual prediction
+#hard code function to make smooth
+vert=24.8037 
+horz=-0.6658
+shift=-1.7203
+x<-seq(0.2,5,0.1)
+lines(x,vert/(x - horz)+shift, col="blue")
+```
+
+```{r amp150_vs_lockin150_rational}
+#png("figure3.png", width=500, height=350) #open the file
+
+#plot amp150 data with fit
+plot(SNR~POSITION,data=amp150,pch=21,bg="black",xlim=c(0,5),ylim=c(0,45),cex=1.2,ylab="Signal-to-Noise Ratio",xlab="LED Position (cm)")
+# error bars
+arrows(amp150$POSITION, amp150$SNR - amp150$SIG_ERR/amp150$NOISE_ERR, amp150$POSITION, amp150$SNR + amp150$SIG_ERR/amp150$NOISE_ERR, length=0.05, angle=90, code=3)
+#hard code fitting function (calculated below)
+vert=30.22316
+horz=-0.19192
+shift=-6.42245
+x<-seq(0.2,5,0.1)
+lines(x,vert/(x - horz)+shift, col="black")
+
+#plot lockin50 data on same graph
+points(SNR~POSITION,data=lockin150,pch=1,bg="red",cex=1.2,col="red")
+# error bars
+arrows(lockin150$POSITION, lockin150$SNR - lockin150$SIG_ERR/lockin150$NOISE_ERR, lockin150$POSITION, lockin150$SNR + lockin150$SIG_ERR/lockin150$NOISE_ERR, length=0.05, angle=90, code=3, col="red")
+#hard code fitting function (calculated below)
+vert=56.33809
+horz=-0.15290
+shift=-11.35119
+x<-seq(0.2,5,0.1)
+lines(x,vert/(x - horz)+shift, col="red")
+
+#add legend to plot
+legend("topright", legend=c("Amplitude (Bandpass)", "Lock-in"), col=c("black", "red"), pch = c(16,1), cex=1.2) #lty=1:2
+
+#dev.off() #close the file
+```
+
+```{r remove1stPoint}
+#ONLY DO ONCE AFTER READING DATA
+#remove 1st row of data
+amp150 <- amp150[-c(1),]
+lockin150 <- lockin150[-c(1),]
+```
+
+
+```{r amp150_vs_lockin150}
+png("figure3.png", width=500, height=350) #open the file
+
+#plot amp150 data with fit
+plot(SNR~POSITION,data=amp150,pch=21,bg="black",xlim=c(0.2,5),ylim=c(0,80),cex=1.2,ylab="Signal-to-Noise Ratio",xlab="LED Position (cm)")
+# error bars
+arrows(amp150$POSITION, amp150$SNR - amp150$SIG_ERR/amp150$NOISE_ERR, amp150$POSITION, amp150$SNR + amp150$SIG_ERR/amp150$NOISE_ERR, length=0.05, angle=90, code=3)
+#hard code fitting function (calculated below)
+vert=193.53208 
+horz=-1.20102
+shift=0.03851
+x<-seq(0.2,5,0.1)
+lines(x,vert/(x - horz)^3+shift, col="black")
+
+#plot lockin50 data on same graph
+points(SNR~POSITION,data=lockin150,pch=1,bg="red",cex=1.2,col="red")
+# error bars
+arrows(lockin150$POSITION, lockin150$SNR - lockin150$SIG_ERR/lockin150$NOISE_ERR, lockin150$POSITION, lockin150$SNR + lockin150$SIG_ERR/lockin150$NOISE_ERR, length=0.05, angle=90, code=3, col="red")
+#hard code fitting function (calculated below)
+vert=98.37356 
+horz=-0.61205
+shift=-1.52347 
+x<-seq(0.2,5,0.1)
+lines(x,vert/(x - horz)^2+shift, col="red")
+
+#add legend to plot
+legend("topright", legend=c("Amplitude (Bandpass)", "Lock-in"), col=c("black", "red"), pch = c(16,1), cex=1.2) #lty=1:2
+
+dev.off() #close the file
+```
+
+```{r fit_amp150}
+xdata = amp150$POSITION
+ydata = amp150$SNR
+y = ydata
+x = xdata
+#x<-seq(0.2,5,0.5)
+rat=nls(y~vert/(x - horz)^3+shift, start=list(vert=10,horz=0,shift=0))
+summary(rat)
+plot(xdata,ydata, col="black",pch=16,cex=1.1, xlim=c(0,6),ylim=c(0,20))
+lines(x,predict(rat),col="red") #actual prediction
+#hard code function to make smooth
+vert=193.53208
+horz=-1.20102
+shift=0.03851
+x<-seq(0.2,5,0.1)
+lines(x,vert/(x - horz)^3+shift, col="blue")
+```
+
+```{r fit_lockin150}
+xdata = lockin150$POSITION
+ydata = lockin150$SNR
+y = ydata
+x = xdata
+#x<-seq(0.2,5,0.5)
+rat=nls(y~vert/(x - horz)^2+shift, start=list(vert=5,horz=0,shift=0))
+summary(rat)
+plot(xdata,ydata, col="black",pch=16,cex=1.1, xlim=c(0,6),ylim=c(0,20))
+lines(x,predict(rat),col="red") #actual prediction
+#hard code function to make smooth
+vert=98.37356 
+horz=-0.61205
+shift=-1.52347 
+x<-seq(0.2,5,0.1)
+lines(x,vert/(x - horz)^2+shift, col="blue")
+```
+
+
